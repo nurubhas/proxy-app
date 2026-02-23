@@ -1,0 +1,15 @@
+{
+  "name": "static-auth-proxy",
+  "version": "1.0.0",
+  "description": "Containerized proxy with custom login page to hide backend URL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "http-proxy-middleware": "^2.0.6"
+  }
+}

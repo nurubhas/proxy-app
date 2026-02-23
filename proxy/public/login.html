@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Login</title>
+    <link rel="stylesheet" href="/auth/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div id="error" class="error" style="display:none;">Invalid credentials. Please contact Cloud Platform Team.</div>
+            <div class="login-header">
+                <h1>🔐 Secure Access</h1>
+                <p>Please login to continue</p>
+            </div>
+            
+            <form method="POST" action="/login" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Enter username" 
+                        required 
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter password" 
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+
+            <div class="login-footer">
+                <p>Secure connection • Session timeout: 1 hour</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function(){
+            const loginBox = document.querySelector('.login-box');
+            const errorDiv = document.getElementById('error');
+
+            function triggerErrorAnimation() {
+                if (errorDiv) errorDiv.style.display = 'block';
+                if (loginBox) {
+                    loginBox.classList.add('shake');
+                    // Remove the class after the animation ends so it can be re-triggered
+                    setTimeout(() => {
+                        loginBox.classList.remove('shake');
+                    }, 820); // Must match the animation duration in CSS
+                }
+            }
+
+            try {
+                const p = new URLSearchParams(window.location.search);
+                if (p.get('error')) {
+                    triggerErrorAnimation();
+                }
+            } catch (e) {}
+
+            // Intercept form submission to encode credentials
+            const loginForm = document.querySelector('.login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const uInput = document.getElementById('username');
+                    const pInput = document.getElementById('password');
+                    
+                    // Send credentials in Authorization header so Payload is empty
+                    const credentials = btoa(uInput.value + ':' + pInput.value);
+
+                    fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Basic ' + credentials,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).then(function(res) {
+                        if (res.ok) {
+                            window.location.href = '/';
+                        } else {
+                            triggerErrorAnimation();
+                        }
+                    }).catch(function() {
+                        triggerErrorAnimation();
+                    });
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
